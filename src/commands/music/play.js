@@ -35,7 +35,13 @@ export default {
       // Join voice channel if not connected
       if (!isConnected(interaction.guildId)) {
         logger.info(`Joining voice channel: ${voiceChannel.name}`);
-        await joinChannel(voiceChannel);
+        try {
+          await joinChannel(voiceChannel);
+        } catch (joinError) {
+          logger.error('Join channel error:', joinError);
+          const embed = createEmbed('error', '❌ Error', 'Failed to join voice channel. Please check bot permissions:\n- Connect\n- Speak\n- View Channel');
+          return interaction.editReply({ content: '', embeds: [embed] });
+        }
       }
       
       const query = interaction.options.getString('query');
