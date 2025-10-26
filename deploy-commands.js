@@ -40,19 +40,29 @@ async function deployCommands() {
     
     console.log(`🚀 Started refreshing ${commands.length} application (/) commands.`);
     
-    // Deploy to guild (faster for development)
-    const data = await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
-      { body: commands },
-    );
+    // Deploy to specific guild first (faster for testing)
+    if (process.env.GUILD_ID) {
+      try {
+        const guildData = await rest.put(
+          Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+          { body: commands },
+        );
+        console.log(`✅ Successfully reloaded ${guildData.length} guild commands.`);
+      } catch (error) {
+        console.error('❌ Failed to deploy guild commands:', error);
+      }
+    }
     
-    console.log(`✅ Successfully reloaded ${data.length} application (/) commands.`);
-    
-    // Uncomment below to deploy globally (takes up to 1 hour)
-    // const data = await rest.put(
-    //   Routes.applicationCommands(process.env.CLIENT_ID),
-    //   { body: commands },
-    // );
+    // Also deploy globally (takes up to 1 hour to propagate)
+    try {
+      const globalData = await rest.put(
+        Routes.applicationCommands(process.env.CLIENT_ID),
+        { body: commands },
+      );
+      console.log(`✅ Successfully reloaded ${globalData.length} global commands.`);
+    } catch (error) {
+      console.error('❌ Failed to deploy global commands:', error);
+    }
     
   } catch (error) {
     console.error('❌ Error deploying commands:', error);
