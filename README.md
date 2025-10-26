@@ -221,6 +221,50 @@ export default {
 - Jalankan `npm install` untuk install semua dependencies
 - Pastikan menggunakan Node.js v16.9.0+
 
+### Voice connection timeout di hosting (Railway/Render/Replit)
+
+**Masalah:** Bot timeout saat join voice channel
+
+**Penyebab:**
+- Missing system dependencies (ffmpeg, libsodium, opus)
+- Docker/container tidak punya audio libraries
+
+**Solusi:**
+
+#### Untuk Railway:
+1. Gunakan `nixpacks.toml` yang sudah disediakan
+2. Atau tambahkan di **Settings** → **Environment**:
+   ```
+   NIXPACKS_PKGS=nodejs-20_x ffmpeg libsodium opus
+   ```
+
+#### Untuk Render:
+1. Gunakan `Dockerfile` yang sudah disediakan
+2. Atau tambahkan di **Build Command**:
+   ```
+   apt-get update && apt-get install -y ffmpeg libsodium-dev libopus-dev && npm install
+   ```
+
+#### Untuk Replit:
+1. Buat file `.replit` dengan config yang benar (sudah disediakan)
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Replit sudah include ffmpeg by default
+
+#### Untuk Docker:
+```bash
+docker build -t jarmusic .
+docker run -d --env-file .env jarmusic
+```
+
+**Masih error?**
+- Pastikan bot punya permission **Connect** dan **Speak**
+- Coba ubah voice region Discord server
+- Check logs: Bot akan log detail error
+- Re-invite bot dengan permissions yang benar
+
 ## 📚 Resources
 
 - [Discord.js Guide](https://discordjs.guide/)
